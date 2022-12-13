@@ -34,7 +34,7 @@ export default function LoginPage() {
       const authResponse = await pocketbaseClient
         .collection('users')
         .authWithPassword(values.usernameOrEmail, values.password);
-      router.push('/home');
+      router.push('/habits');
     } catch (error) {
       openNotification('Error', 'Could not sign you in - ' + error);
       console.log(error);
