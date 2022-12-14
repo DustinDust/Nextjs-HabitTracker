@@ -15,7 +15,7 @@ export type HabitRecord = PBRecord & Habit;
 
 const columns: TableColumnsType<HabitRecord> = [
   {
-    title: 'Habit name',
+    title: 'Name',
     dataIndex: 'habit_name',
     key: 'habit_name',
   },

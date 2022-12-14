@@ -53,7 +53,7 @@ export default function HabitInfo(props: HabitInfoProps) {
                 </Tooltip>
               ) : (
                 <Tag color='cyan'>
-                  {prettyMilliSeconds(props.habit.target || 0)}
+                  {prettyMilliSeconds(props.habit.target * 1000 || 0)}
                 </Tag>
               )}
             </Descriptions.Item>
