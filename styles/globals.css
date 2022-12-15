@@ -3,3 +3,7 @@
 @tailwind utilities;
 
 @import url('https://fonts.googleapis.com/css2?family=Mulish&display=swap');
+body {
+	min-width: 100vw !important;
+	min-height: 100vh !important;
+}

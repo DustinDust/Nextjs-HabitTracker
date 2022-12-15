@@ -7,11 +7,14 @@ import Sider from '../../components/Sider';
 import HabitTable from '../../components/HabitTable';
 import { breakPoints } from '../../utils/breakpoint';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { useRouter } from 'next/router';
 
 export default function UserHomePage() {
   const isLg = useMedia(`(min-width: ${breakPoints.lg}px)`, false);
   const [usernameOrEmail, setUsernameOrEmail] = useState<string>('');
+  const [displayName, setDisplayName] = useState<string>('');
   const [api, ContextHolder] = notification.useNotification();
+  const router = useRouter();
   useEffect(() => {
     function openNotification(message: string, description: any) {
       api.open({
@@ -35,17 +38,20 @@ export default function UserHomePage() {
             `Successfully sign in as ${data.record.username}`
           );
           setUsernameOrEmail(pocketbaseClient.authStore.model?.username);
+          setDisplayName(pocketbaseClient.authStore.model?.name);
         })
         .catch((e) => {
           openNotification(
             'Sign-in error',
             `Some error had occurred while we tried to sign you in, please sign-in againm -- ${e}`
           );
+          router.push('/sign-in');
         });
     } else {
       setUsernameOrEmail(pocketbaseClient.authStore.model?.username);
+      setDisplayName(pocketbaseClient.authStore.model?.name);
     }
-  }, [setUsernameOrEmail, api]);
+  }, [api]);
 
   return (
     <>
@@ -82,7 +88,7 @@ export default function UserHomePage() {
                         borderRadius: '5px',
                       }}
                     >
-                      {usernameOrEmail}
+                      {displayName}
                     </Typography.Text>
                   </Typography.Text>
                 }

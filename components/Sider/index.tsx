@@ -1,21 +1,92 @@
-import { Avatar, Layout, Typography } from 'antd';
+import { Avatar, Layout, Typography, MenuProps, Menu } from 'antd';
+import {
+  UserOutlined,
+  AreaChartOutlined,
+  LogoutOutlined,
+  GithubOutlined,
+  MenuOutlined,
+  CloseOutlined,
+  ExclamationCircleOutlined,
+} from '@ant-design/icons';
 import { useState, useEffect } from 'react';
 import pocketbaseClient from '../../utils/pocketbase';
+import { useRouter } from 'next/router';
+import useNotification from '../../utils/useNotification';
 export interface SiderProps {}
+
+type MenuItem = Required<MenuProps>['items'][number];
+
+function getItem(
+  label: React.ReactNode,
+  key: React.Key,
+  icon?: React.ReactNode,
+  children?: MenuItem[],
+  type?: 'group'
+): MenuItem {
+  return {
+    key,
+    icon,
+    children,
+    label,
+    type,
+  } as MenuItem;
+}
+
+const menuItems: MenuProps['items'] = [
+  getItem('Habits', 'habits', <AreaChartOutlined />),
+  getItem('Profile', 'profile', <UserOutlined />),
+  getItem('Sign-out', 'signout', <LogoutOutlined />),
+  getItem('Source', 'about', <GithubOutlined />),
+];
 
 export default function Sider(props: SiderProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(true);
-
   const [username, setUsername] = useState<string>();
+  const router = useRouter();
   const [avt, setAvt] = useState('');
+  const [openNotification, contextHolder] = useNotification();
+
+  const onMenuItemClicked: MenuProps['onClick'] = (inf) => {
+    switch (inf.key) {
+      case 'habits':
+        router.push('/habits');
+        setSidebarCollapsed(true);
+        break;
+      case 'profile':
+        router.push('/profile');
+        setSidebarCollapsed(true);
+        break;
+      case 'signout':
+        try {
+          pocketbaseClient.authStore.clear();
+          setSidebarCollapsed(true);
+          router.push('/sign-in');
+        } catch (err) {
+          openNotification(
+            'Error',
+            'Could not sign you out',
+            () => {},
+            <ExclamationCircleOutlined />
+          );
+        }
+        break;
+      case 'about':
+        window.open(
+          'https://github.com/DustinDust/Nextjs-HabitTracker',
+          '_blank'
+        );
+        break;
+    }
+  };
 
   useEffect(() => {
-    setUsername(pocketbaseClient.authStore.model?.username);
+    setUsername(pocketbaseClient.authStore.model?.name);
     setAvt(pocketbaseClient.authStore.model?.avatar);
   }, [setUsername, setAvt]);
 
   return (
     <>
+      {contextHolder}
       <Layout.Sider
         style={{
           // background: 'white',
@@ -28,6 +99,8 @@ export default function Sider(props: SiderProps) {
           bottom: 0,
           zIndex: 20,
         }}
+        trigger={sidebarCollapsed ? <MenuOutlined /> : <CloseOutlined />}
+        width='230px'
         collapsible
         defaultCollapsed={sidebarCollapsed}
         collapsed={sidebarCollapsed}
@@ -35,6 +108,7 @@ export default function Sider(props: SiderProps) {
         onCollapse={(collapsed) => {
           setSidebarCollapsed(collapsed);
         }}
+        theme='light'
       >
         <div className='flex flex-col items-center justify-center px-6 py-4 gap-2'>
           {avt ? (
@@ -43,15 +117,17 @@ export default function Sider(props: SiderProps) {
             <Avatar
               alt={'PFP'}
               size='large'
-              style={{ backgroundColor: 'white', color: 'CaptionText' }}
+              style={{
+                backgroundColor: 'ThreeDLightShadow',
+                color: 'HighlightText',
+              }}
             >
               {username?.toUpperCase().at(0)}
             </Avatar>
           )}
-          <Typography.Text style={{ color: 'white' }} strong>
-            {username}
-          </Typography.Text>
+          <Typography.Text strong>{username}</Typography.Text>
         </div>
+        <Menu items={menuItems} mode='inline' onClick={onMenuItemClicked} />
       </Layout.Sider>
       {!sidebarCollapsed ? (
         <div
