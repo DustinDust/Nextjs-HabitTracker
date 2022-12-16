@@ -1,20 +1,23 @@
 import { notification } from 'antd';
+import { useCallback } from 'react';
 
 export default function useNotification() {
   const [api, contextHolder] = notification.useNotification();
   const openNotification = (
     message: string,
     description: string,
-    onClose: () => void,
-    icon: React.ReactNode
+    icon: React.ReactNode,
+    onClose: () => void = () => {},
+    duration: number = 3
   ) => {
     api.open({
       message: message,
       description: description,
-      duration: 3,
+      duration: duration,
       icon: icon,
       onClose: onClose,
     });
   };
-  return [openNotification, contextHolder] as const;
+  const openNotiCallback = useCallback(openNotification, [api]);
+  return [openNotiCallback, contextHolder] as const;
 }

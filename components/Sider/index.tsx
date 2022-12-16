@@ -49,23 +49,22 @@ export default function Sider(props: SiderProps) {
   const onMenuItemClicked: MenuProps['onClick'] = (inf) => {
     switch (inf.key) {
       case 'habits':
-        router.push('/habits');
         setSidebarCollapsed(true);
+        router.push('/habits');
         break;
       case 'profile':
-        router.push('/profile');
         setSidebarCollapsed(true);
+        router.push('/profile');
         break;
       case 'signout':
         try {
-          pocketbaseClient.authStore.clear();
           setSidebarCollapsed(true);
+          pocketbaseClient.authStore.clear();
           router.push('/sign-in');
         } catch (err) {
           openNotification(
             'Error',
             'Could not sign you out',
-            () => {},
             <ExclamationCircleOutlined />
           );
         }
