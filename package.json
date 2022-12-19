@@ -7,7 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "serve": "./pocket_base/pocketbase.exe serve"
+    "serve:windows": "./pocket_base/pocketbase.exe serve",
+    "migrate:windows": "./pocket_base/pocketbase.exe migrate",
+    "serve:linux": "./pocket_base/pocketbase serve",
+    "migrate:linux": "./pocket_base/pocketbase migrate"
   },
   "dependencies": {
     "@ant-design/icons": "^4.8.0",
