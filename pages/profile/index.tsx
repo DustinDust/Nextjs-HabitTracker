@@ -59,7 +59,7 @@ export default function ProfilePage() {
           );
         });
     }
-  }, [openNotification, setUser, router]);
+  }, [openNotification, setUser, router, user?.id]);
 
   return (
     <>
@@ -82,11 +82,7 @@ export default function ProfilePage() {
                 </Typography.Title>
               }
             >
-              <UserProfile
-                user={user}
-                loading={loading}
-                habitsNum={habitNum > 0 ? habitNum : undefined}
-              />
+              <UserProfile user={user} loading={loading} habitsNum={habitNum} />
             </Card>
           </Layout.Content>
         </Layout>

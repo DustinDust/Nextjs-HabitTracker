@@ -117,8 +117,8 @@ export default function Sider(props: SiderProps) {
               alt={'PFP'}
               size='large'
               style={{
-                backgroundColor: 'ThreeDLightShadow',
-                color: 'HighlightText',
+                backgroundColor: 'black',
+                color: 'white',
               }}
             >
               {username?.toUpperCase().at(0)}

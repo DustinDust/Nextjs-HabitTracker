@@ -5,7 +5,7 @@ import { ago } from '../../utils';
 export interface UserProfileProps {
   user?: Record | Admin;
   loading?: boolean;
-  habitsNum?: number;
+  habitsNum: number;
 }
 
 export default function UserProfile(props: UserProfileProps) {
@@ -32,7 +32,13 @@ export default function UserProfile(props: UserProfileProps) {
           )}
         </Descriptions.Item>
         <Descriptions.Item label={'Number of habit registered'}>
-          {props.loading ? <Skeleton.Input /> : props.habitsNum || 'N/A'}
+          {props.loading ? (
+            <Skeleton.Input />
+          ) : props.habitsNum > 0 ? (
+            props.habitsNum
+          ) : (
+            'N/A'
+          )}
         </Descriptions.Item>
       </Descriptions>
     </>

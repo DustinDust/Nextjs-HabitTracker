@@ -112,6 +112,7 @@ export default function HabitTable() {
           },
         };
       }}
+      // scroll={{ y: 420 }}
       size={isLg ? 'large' : 'small'}
       columns={columns}
       rowKey={'id'}

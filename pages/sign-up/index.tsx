@@ -52,19 +52,19 @@ export default function SignupPage() {
       openNotification(
         'Successfully registered',
         'You have signed up successfully, We will navigate you to the sign-in site shortly, or close this notification to navigate immidiately',
+        <CheckOutlined />,
         () => {
           router.push('/sign-in');
-        },
-        <CheckOutlined />
+        }
       );
     } catch (error) {
       openNotification(
         'Error',
         'Could not sign you in - ' + error,
+        <ExclamationCircleOutlined />,
         () => {
           console.log(error);
-        },
-        <ExclamationCircleOutlined />
+        }
       );
     } finally {
       setLoading(false);
