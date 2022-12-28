@@ -1,3 +1,5 @@
+import { Record } from 'pocketbase';
+
 export interface Habit {
   id: string;
   habit_name: string;
@@ -26,3 +28,7 @@ export interface HabitStatus {
   created: string;
   updated: string;
 }
+
+export type HabitRecord = Habit & Record;
+export type HabitStatusRecord = HabitStatus & Record;
+export type UserRecord = User & Record;

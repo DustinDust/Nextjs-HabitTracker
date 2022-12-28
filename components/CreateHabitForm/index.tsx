@@ -8,14 +8,10 @@ import {
   Row,
   Col,
 } from 'antd';
-import { Habit, breakPoints } from '../../utils';
 import { useMedia } from 'react-use';
 import { useState } from 'react';
-import dayjs from 'dayjs';
-import { FieldStringOutlined, FieldNumberOutlined } from '@ant-design/icons';
 import { Cron } from 'react-js-cron';
-import pocketbaseClient from '../../utils/pocketbase';
-import { HabitRecord } from '../HabitTable';
+import { HabitRecord, pocketbaseClient, breakPoints } from '../../utils';
 
 export type CreateHabitFormProps = {
   children?: React.ReactNode;

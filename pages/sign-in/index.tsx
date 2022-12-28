@@ -14,11 +14,11 @@ import {
   ExclamationCircleOutlined,
 } from '@ant-design/icons';
 import LayoutContainer from '../../components/Layout';
-import pocketbaseClient from '../../utils/pocketbase';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Link from 'next/link';
+import { pocketbaseClient } from '../../utils';
 
 type LoginFormData = {
   usernameOrEmail: string;

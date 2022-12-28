@@ -1,17 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Habit } from '../../utils/types';
-import { Record as PBRecord } from 'pocketbase';
-import pocketbaseClient from '../../utils/pocketbase';
 import { TablePaginationConfig, TableColumnsType, Table, Tag } from 'antd';
 import { FilterValue, SorterResult } from 'antd/es/table/interface';
 import prettyMilliseconds from 'pretty-ms';
 import cronstrue from 'cronstrue';
-import { breakPoints } from '../../utils/breakpoint';
 import { useMedia } from 'react-use';
 import { useRouter } from 'next/router';
-import { ago } from '../../utils';
-
-export type HabitRecord = PBRecord & Habit;
+import { ago, pocketbaseClient, breakPoints, HabitRecord } from '../../utils';
 
 const columns: TableColumnsType<HabitRecord> = [
   {

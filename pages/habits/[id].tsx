@@ -1,13 +1,12 @@
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { BackTop, Card, Layout, Skeleton, Typography } from 'antd';
+import { Card, Layout, Skeleton, Typography } from 'antd';
 import Sider from '../../components/Sider';
 import { useMedia } from 'react-use';
-import { breakPoints } from '../../utils/breakpoint';
+import { breakPoints, HabitRecord, pocketbaseClient } from '../../utils';
 import { useEffect, useState } from 'react';
 import HabitInfo from '../../components/HabitInfo';
-import { HabitRecord } from '../../components/HabitTable';
-import pocketbaseClient from '../../utils/pocketbase';
+import { HabitProgress } from '../../components/HabitProgress';
 
 export default function HabitPage() {
   const router = useRouter();
@@ -54,7 +53,7 @@ export default function HabitPage() {
               bordered={false}
               title={
                 loading ? (
-                  <Skeleton.Input active size='large' />
+                  <Skeleton.Input size='large' active />
                 ) : habitData ? (
                   <Typography.Title level={isLg ? 3 : 4}>
                     {habitData?.habit_name}
@@ -67,19 +66,11 @@ export default function HabitPage() {
               <Card.Meta
                 description={
                   loading ? (
-                    <Skeleton.Input size='default' active />
+                    <Skeleton.Input size='large' active />
                   ) : habitData ? (
                     <Typography.Text style={{ color: 'GrayText' }}>
                       Display the details of habit{' '}
-                      <Typography.Text
-                        strong
-                        // style={{
-                        //   color: 'white',
-                        //   backgroundColor: 'darkslategray',
-                        //   padding: '1px 5px',
-                        //   borderRadius: '5px',
-                        // }}
-                      >
+                      <Typography.Text strong>
                         {habitData?.habit_name}
                       </Typography.Text>
                     </Typography.Text>
@@ -88,7 +79,16 @@ export default function HabitPage() {
                   )
                 }
               />
-              <HabitInfo habit={habitData} loading={loading} />
+              {habitData && !loading ? (
+                <HabitInfo habit={habitData} loading={loading} />
+              ) : (
+                <Skeleton style={{ marginTop: '1rem' }} active={true} />
+              )}
+              {habitData && !loading ? (
+                <HabitProgress habit={habitData} />
+              ) : (
+                <Skeleton active={true} />
+              )}
             </Card>
           </Layout.Content>
         </Layout>

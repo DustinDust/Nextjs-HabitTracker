@@ -22,9 +22,7 @@ import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { useMedia } from 'react-use';
 import LayoutContainer from '../../components/Layout';
-import { breakPoints } from '../../utils/breakpoint';
-import pocketbaseClient from '../../utils/pocketbase';
-import useNotification from '../../utils/useNotification';
+import { breakPoints, useNotification, pocketbaseClient } from '../../utils';
 
 export interface SignUpFormData {
   username: string;

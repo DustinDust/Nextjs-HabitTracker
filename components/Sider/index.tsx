@@ -9,9 +9,9 @@ import {
   ExclamationCircleOutlined,
 } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
-import pocketbaseClient from '../../utils/pocketbase';
 import { useRouter } from 'next/router';
-import useNotification from '../../utils/useNotification';
+import { pocketbaseClient, useNotification } from '../../utils';
+
 export interface SiderProps {}
 
 type MenuItem = Required<MenuProps>['items'][number];

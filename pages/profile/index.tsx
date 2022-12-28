@@ -2,13 +2,11 @@ import Head from 'next/head';
 import { Admin, Record } from 'pocketbase';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
-import pocketbaseClient from '../../utils/pocketbase';
-import useNotification from '../../utils/useNotification';
 import { useRouter } from 'next/router';
 import { Layout, Card, Typography } from 'antd';
 import Sider from '../../components/Sider';
 import { useMedia } from 'react-use';
-import { breakPoints } from '../../utils';
+import { breakPoints, pocketbaseClient, useNotification } from '../../utils';
 import UserProfile from '../../components/UserProfile';
 
 export type AuthStoreType = Record | Admin;

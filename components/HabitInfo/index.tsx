@@ -1,8 +1,7 @@
 import { Descriptions, Empty, Skeleton, Tag, Tooltip, Typography } from 'antd';
-import type { HabitRecord } from '../HabitTable';
 import prettyMilliSeconds from 'pretty-ms';
 import cronstrue from 'cronstrue';
-import { ago } from '../../utils';
+import { ago, HabitRecord } from '../../utils';
 import { Record } from 'pocketbase';
 
 export interface HabitInfoProps {

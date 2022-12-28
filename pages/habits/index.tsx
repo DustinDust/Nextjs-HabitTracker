@@ -1,4 +1,3 @@
-import pocketbaseClient from '../../utils/pocketbase';
 import {
   Card,
   Layout,
@@ -13,15 +12,19 @@ import { useEffect, useState } from 'react';
 import Head from 'next/head';
 import { useMedia } from 'react-use';
 import Sider from '../../components/Sider';
-import HabitTable, { HabitRecord } from '../../components/HabitTable';
-import { breakPoints } from '../../utils/breakpoint';
+import HabitTable from '../../components/HabitTable';
 import {
   CheckCircleOutlined,
   ExclamationCircleOutlined,
 } from '@ant-design/icons';
 import { useRouter } from 'next/router';
-import useNotification from '../../utils/useNotification';
 import CreateHabitForm from '../../components/CreateHabitForm';
+import {
+  HabitRecord,
+  pocketbaseClient,
+  breakPoints,
+  useNotification,
+} from '../../utils';
 
 export default function HabitsPage() {
   const isLg = useMedia(`(min-width: ${breakPoints.lg}px)`, false);
@@ -107,6 +110,7 @@ export default function HabitsPage() {
             <Card
               style={{
                 cursor: 'default',
+                minHeight: '100%',
               }}
               bordered={true}
               title={

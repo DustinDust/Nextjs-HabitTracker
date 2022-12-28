@@ -1,7 +1,7 @@
 import { notification } from 'antd';
 import { useCallback } from 'react';
 
-export default function useNotification() {
+export function useNotification() {
   const [api, contextHolder] = notification.useNotification();
   const openNotification = (
     message: string,
