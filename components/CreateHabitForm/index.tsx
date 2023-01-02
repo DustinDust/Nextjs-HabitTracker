@@ -126,6 +126,7 @@ export default function CreateHabitForm(props: CreateHabitFormProps) {
               setCron(value);
               form.setFieldValue('cron', value);
             }}
+            humanizeValue={true}
             disabled={loading}
             clearButton={false}
             displayError={form.getFieldError('cron').length > 0}

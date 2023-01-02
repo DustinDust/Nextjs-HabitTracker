@@ -1,40 +1,97 @@
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { Card, Layout, Skeleton, Typography } from 'antd';
+import {
+  Button,
+  Card,
+  Layout,
+  Popconfirm,
+  Skeleton,
+  Space,
+  Typography,
+} from 'antd';
 import Sider from '../../components/Sider';
 import { useMedia } from 'react-use';
-import { breakPoints, HabitRecord, pocketbaseClient } from '../../utils';
+import {
+  breakPoints,
+  HabitRecord,
+  pocketbaseClient,
+  useNotification,
+} from '../../utils';
 import { useEffect, useState } from 'react';
 import HabitInfo from '../../components/HabitInfo';
-import { HabitProgress } from '../../components/HabitProgress';
+import { HabitProgressCard } from '../../components/HabitProgress';
+import {
+  DeleteOutlined,
+  EditOutlined,
+  ExclamationCircleOutlined,
+} from '@ant-design/icons';
 
 export default function HabitPage() {
   const router = useRouter();
   const isLg = useMedia(`(min-width: ${breakPoints.lg}px)`, false);
   const [habitData, setHabitData] = useState<HabitRecord>();
   const [loading, setLoading] = useState<boolean>(false);
+  const [updateFormShow, setUpdateFormShow] = useState<boolean>(false);
+  const [deleteDialougeShow, setDeleteDialougeShow] = useState<boolean>(false);
+  const [deleteLoading, setDeleteLoading] = useState<boolean>(false);
+  const [openNotification, contextHolder] = useNotification();
 
   useEffect(() => {
+    console.log(`rendering habit ${router.query.id}`);
     setLoading(true);
+    if (!router.query.id) {
+      return;
+    }
     pocketbaseClient
       .collection('habits')
-      .getOne<HabitRecord>(router.query.id as string, { expand: 'user' })
+      .getOne<HabitRecord>(router.query.id as string, {
+        $cancelKey: `habit_${router.query.id}`,
+        expand: 'user',
+      })
       .then((data) => {
         setHabitData(data);
       })
       .catch((err) => {
-        console.log(err);
+        console.log(`Error on habit page ${err}`);
       })
       .finally(() => {
         setLoading(false);
       });
   }, [router.query]);
 
+  const handleDeleteConfirm = async () => {
+    try {
+      setDeleteLoading(true);
+      const id = router.query.id;
+      if (!id) {
+        throw new Error('Undefined id');
+      } else if (id instanceof Array) {
+        throw new Error('Invalid id');
+      }
+      await pocketbaseClient.collection('habits').delete(id, {
+        $cancelKey: `deletehabit${id}`,
+      });
+      router.replace('/habits');
+    } catch (e) {
+      openNotification(
+        'Error',
+        'Failed to delete item' + e,
+        <ExclamationCircleOutlined />
+      );
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+  const onDeleteCancel = () => {
+    setDeleteDialougeShow(false);
+  };
+
   return (
     <>
       <Head>
         <title>{habitData?.habit_name}</title>
       </Head>
+      {contextHolder}
       <div className='font-mulish'>
         <Layout hasSider style={{ fontFamily: 'inherit' }}>
           <Sider />
@@ -55,9 +112,54 @@ export default function HabitPage() {
                 loading ? (
                   <Skeleton.Input size='large' active />
                 ) : habitData ? (
-                  <Typography.Title level={isLg ? 3 : 4}>
-                    {habitData?.habit_name}
-                  </Typography.Title>
+                  <div className='flex flex-row justify-between'>
+                    <Typography.Title level={isLg ? 3 : 4}>
+                      {habitData?.habit_name}
+                    </Typography.Title>
+                    <div className='flex gap-2'>
+                      <Button
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                        }}
+                      >
+                        <EditOutlined style={{ marginTop: 0, paddingTop: 0 }} />
+                      </Button>
+                      <Popconfirm
+                        title='Are you sure?'
+                        open={deleteDialougeShow}
+                        okText='Yea'
+                        cancelText='Nah'
+                        icon={<ExclamationCircleOutlined />}
+                        okButtonProps={{
+                          loading: deleteLoading,
+                          type: 'default',
+                          danger: true,
+                        }}
+                        onConfirm={handleDeleteConfirm}
+                        onCancel={onDeleteCancel}
+                        showArrow
+                        showCancel
+                      >
+                        <Button
+                          style={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}
+                          danger
+                          onClick={() => {
+                            setDeleteDialougeShow(true);
+                          }}
+                        >
+                          <DeleteOutlined
+                            style={{ marginTop: 0, paddingTop: 0 }}
+                          />
+                        </Button>
+                      </Popconfirm>
+                    </div>
+                  </div>
                 ) : (
                   ''
                 )
@@ -85,7 +187,7 @@ export default function HabitPage() {
                 <Skeleton style={{ marginTop: '1rem' }} active={true} />
               )}
               {habitData && !loading ? (
-                <HabitProgress habit={habitData} />
+                <HabitProgressCard habit={habitData} />
               ) : (
                 <Skeleton active={true} />
               )}

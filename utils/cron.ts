@@ -1,27 +1,21 @@
 import dayjs from 'dayjs';
 import parser from 'cron-parser';
+import * as cronjsMatcher from '@datasert/cronjs-matcher';
+import { Cron } from 'croner';
+import { parse } from '@datasert/cronjs-parser';
 
-export const getIntervals = (expression: string) => {
+export const getIntervals = (
+  expression: string,
+  period: 'day' | 'week' | 'month' | 'year'
+) => {
   const currentDate = dayjs(new Date());
-  const weeklyIntervals = parser.parseExpression(expression, {
+
+  return parser.parseExpression(expression, {
     // currentDate: currentDate.toDate(),
-    startDate: currentDate.startOf('week').toDate(),
-    endDate: currentDate.endOf('week').toDate(),
+    startDate: currentDate.startOf(period).toDate(),
+    endDate: currentDate.endOf(period).toDate(),
     iterator: true,
   });
-  const monthlyIntervals = parser.parseExpression(expression, {
-    // currentDate: currentDate.toDate(),
-    startDate: currentDate.startOf('month').toDate(),
-    endDate: currentDate.endOf('month').toDate(),
-    iterator: true,
-  });
-  const yearlyIntervals = parser.parseExpression(expression, {
-    // currentDate: currentDate.toDate(),
-    startDate: currentDate.startOf('year').toDate(),
-    endDate: currentDate.endOf('year').toDate(),
-    iterator: true,
-  });
-  return { weeklyIntervals, monthlyIntervals, yearlyIntervals };
 };
 
 export const getOccurences = (intervals: parser.CronExpression<true>) => {
@@ -38,5 +32,40 @@ export const getOccurences = (intervals: parser.CronExpression<true>) => {
     count++;
     occurences.unshift(d.value.toDate());
   }
-  return { count, occurences };
+  console.log(occurences);
+  return { count, occurences: occurences.map((value) => value.toISOString()) };
 };
+
+export const getMatches = (
+  expr: string,
+  option: { period: 'week' | 'month' | 'year' }
+) => {
+  console.log(expr);
+  const cron = parse(expr, { hasSeconds: false });
+  const currentDate = dayjs(new Date());
+  const options = {
+    startAt: currentDate.startOf(option.period).toISOString(),
+    endAt: currentDate.endOf(option.period).toISOString(),
+  };
+  const matches = cronjsMatcher.getFutureMatches(cron, {
+    ...options,
+    matchCount: 10000,
+  });
+  console.log(matches);
+  return matches;
+};
+
+export function getScheduledDates(
+  expression: string,
+  option: { period: 'month' | 'week' | 'year' }
+) {
+  console.log(expression);
+  const currentDate = dayjs(new Date());
+  const cron = new Cron(expression, {
+    maxRuns: Infinity,
+  });
+  console.log(cron.next(currentDate.startOf(option.period).toDate()));
+  const scheduleDates = cron.enumerate(10);
+  console.log(scheduleDates);
+  return scheduleDates;
+}
