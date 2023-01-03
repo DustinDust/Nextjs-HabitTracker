@@ -2,9 +2,14 @@ import { Card, Typography } from 'antd';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import LayoutContainer from '../components/Layout';
+import { useEffect } from 'react';
+import { pocketbaseClient } from '../utils';
 
 export default function Home() {
   const router = useRouter();
+  if (pocketbaseClient.authStore.isValid) {
+    router.push('/habits');
+  }
   function handleSignin(event: any) {
     router.push('/sign-in');
   }

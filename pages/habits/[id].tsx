@@ -4,6 +4,7 @@ import {
   Button,
   Card,
   Layout,
+  Modal,
   Popconfirm,
   Skeleton,
   Space,
@@ -21,10 +22,13 @@ import { useEffect, useState } from 'react';
 import HabitInfo from '../../components/HabitInfo';
 import { HabitProgressCard } from '../../components/HabitProgress';
 import {
+  CheckCircleFilled,
+  CheckCircleOutlined,
   DeleteOutlined,
   EditOutlined,
   ExclamationCircleOutlined,
 } from '@ant-design/icons';
+import UpdateHabitForm from '../../components/UpdateHabitForm';
 
 export default function HabitPage() {
   const router = useRouter();
@@ -86,6 +90,24 @@ export default function HabitPage() {
     setDeleteDialougeShow(false);
   };
 
+  const onUpdateHabitSuccess = (data: HabitRecord) => {
+    openNotification(
+      'Success',
+      'Successfully updated',
+      <CheckCircleOutlined />
+    );
+    setUpdateFormShow(false);
+    setHabitData(data);
+  };
+
+  const onUpdateHabitFailed = (err: any) => {
+    openNotification(
+      'Error',
+      'Failed to update habit - ' + err,
+      <ExclamationCircleOutlined />
+    );
+  };
+
   return (
     <>
       <Head>
@@ -122,6 +144,9 @@ export default function HabitPage() {
                           display: 'flex',
                           justifyContent: 'center',
                           alignItems: 'center',
+                        }}
+                        onClick={() => {
+                          setUpdateFormShow(true);
                         }}
                       >
                         <EditOutlined style={{ marginTop: 0, paddingTop: 0 }} />
@@ -194,6 +219,26 @@ export default function HabitPage() {
             </Card>
           </Layout.Content>
         </Layout>
+        {habitData ? (
+          <Modal
+            title='Update'
+            onCancel={() => {
+              setUpdateFormShow(false);
+            }}
+            open={updateFormShow}
+            okButtonProps={{ hidden: true }}
+            width={'1000px'}
+            destroyOnClose={true}
+          >
+            <UpdateHabitForm
+              habit={habitData}
+              onFailed={onUpdateHabitFailed}
+              onSuccess={onUpdateHabitSuccess}
+            />
+          </Modal>
+        ) : (
+          <Skeleton />
+        )}
       </div>
     </>
   );

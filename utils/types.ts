@@ -5,6 +5,7 @@ export interface Habit {
   habit_name: string;
   target: number;
   cron: string;
+  user: string;
   created: string;
   updated: string;
 }
