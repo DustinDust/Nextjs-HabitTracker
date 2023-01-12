@@ -6,12 +6,14 @@ import { parse } from '@datasert/cronjs-parser';
 
 export const getIntervals = (
   expression: string,
-  period: 'day' | 'week' | 'month' | 'year'
+  period: 'day' | 'week' | 'month' | 'year',
+  date = new Date()
 ) => {
-  const currentDate = dayjs(new Date());
+  const currentDate = dayjs(date);
 
   return parser.parseExpression(expression, {
     // currentDate: currentDate.toDate(),
+    currentDate: currentDate.toDate(),
     startDate: currentDate.startOf(period).toDate(),
     endDate: currentDate.endOf(period).toDate(),
     iterator: true,
@@ -32,15 +34,15 @@ export const getOccurences = (intervals: parser.CronExpression<true>) => {
     count++;
     occurences.unshift(d.value.toDate());
   }
-  console.log(occurences);
-  return { count, occurences: occurences.map((value) => value.toISOString()) };
+  // console.log(occurences);
+  return { count, occurences: occurences };
 };
 
 export const getMatches = (
   expr: string,
   option: { period: 'week' | 'month' | 'year' }
 ) => {
-  console.log(expr);
+  // console.log(expr);
   const cron = parse(expr, { hasSeconds: false });
   const currentDate = dayjs(new Date());
   const options = {
@@ -51,7 +53,7 @@ export const getMatches = (
     ...options,
     matchCount: 10000,
   });
-  console.log(matches);
+  // console.log(matches);
   return matches;
 };
 
@@ -59,7 +61,7 @@ export function getScheduledDates(
   expression: string,
   option: { period: 'month' | 'week' | 'year' }
 ) {
-  console.log(expression);
+  // console.log(expression);
   const currentDate = dayjs(new Date());
   const cron = new Cron(expression, {
     maxRuns: Infinity,

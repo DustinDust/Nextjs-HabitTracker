@@ -29,6 +29,7 @@ import {
   ExclamationCircleOutlined,
 } from '@ant-design/icons';
 import UpdateHabitForm from '../../components/UpdateHabitForm';
+import HabitStatusCalendar from '../../components/HabitStatusCalendar';
 
 export default function HabitPage() {
   const router = useRouter();
@@ -215,6 +216,13 @@ export default function HabitPage() {
                 <HabitProgressCard habit={habitData} />
               ) : (
                 <Skeleton active={true} />
+              )}
+              {!habitData ? (
+                <Skeleton />
+              ) : (
+                <Card title='Calendar'>
+                  <HabitStatusCalendar habit={habitData} />
+                </Card>
               )}
             </Card>
           </Layout.Content>

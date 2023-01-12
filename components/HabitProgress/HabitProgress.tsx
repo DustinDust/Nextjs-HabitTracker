@@ -3,9 +3,7 @@ import {
   HabitRecord,
   HabitStatusRecord,
   getIntervals,
-  getMatches,
   getOccurences,
-  getScheduledDates,
   pocketbaseClient,
 } from '../../utils';
 import { Progress, Skeleton } from 'antd';
@@ -24,6 +22,7 @@ export default function HabitProgress(props: HabitProgressProps) {
 
   useEffect(() => {
     setLoading(true);
+    console.log('habit' + props.period);
     if (!props.habit.cron) {
       return;
     }
@@ -33,20 +32,20 @@ export default function HabitProgress(props: HabitProgressProps) {
     pocketbaseClient
       .collection('habit_status')
       .getList<HabitStatusRecord>(1, 1, {
-        $cancelKey: props.period,
+        $cancelKey: `${props.habit.id} ${props.period}`,
         filter: `(habit="${
           props.habit.id
-        }" && done=true && (created>="${occurences.occurences.at(
-          0
-        )}" && created<="${occurences.occurences.at(-1)}"))`,
+        }" && done=true && (created>="${occurences.occurences
+          .at(0)
+          ?.toISOString()}" && created<="${occurences.occurences
+          .at(-1)
+          ?.toISOString()}"))`,
       })
       .then((data) => {
         setStatusesCount(data.totalItems);
       })
-      .catch((reason) => {
-        console.log(
-          `Error on component habit progress ${props.habit.id} ${reason}`
-        );
+      .catch((err) => {
+        console.log(`Error on component habit progress ${err}`);
       })
       .finally(() => setLoading(false));
   }, [props.habit.cron, props.period, props.habit.id]);
