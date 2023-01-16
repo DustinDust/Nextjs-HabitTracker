@@ -7,6 +7,7 @@ import {
   Row,
   Button,
   Modal,
+  Spin,
 } from 'antd';
 import { useEffect, useState } from 'react';
 import Head from 'next/head';
@@ -74,7 +75,6 @@ export default function HabitsPage() {
             <CheckCircleOutlined />
           );
           setDisplayName(pocketbaseClient.authStore.model?.name);
-          setLoading(true);
         })
         .catch((e) => {
           openNotification(
@@ -86,6 +86,9 @@ export default function HabitsPage() {
             },
             1
           );
+        })
+        .finally(() => {
+          setLoading(false);
         });
     } else {
       setDisplayName(pocketbaseClient.authStore.model?.name);

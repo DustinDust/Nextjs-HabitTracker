@@ -40,7 +40,7 @@ export default function CreateHabitForm(props: CreateHabitFormProps) {
         .collection('habits')
         .create<HabitRecord>({
           ...data,
-          target: data.target * 60,
+          target: data.target,
           user: pocketbaseClient.authStore.model?.id,
         });
       props.onSuccess ? props.onSuccess(res) : console.log(res);
@@ -118,7 +118,7 @@ export default function CreateHabitForm(props: CreateHabitFormProps) {
           label='Schedule'
           name='cron'
           rules={[{ required: true, message: 'Required!' }]}
-          initialValue={'* * * * *'}
+          initialValue={'0 8 * * *'}
         >
           <Cron
             value={cron}
@@ -126,10 +126,11 @@ export default function CreateHabitForm(props: CreateHabitFormProps) {
               setCron(value);
               form.setFieldValue('cron', value);
             }}
-            humanizeValue={true}
             disabled={loading}
             clearButton={false}
             displayError={form.getFieldError('cron').length > 0}
+            allowedPeriods={['day', 'month', 'week', 'year']}
+            defaultPeriod={'day'}
           />
         </Form.Item>
         <Form.Item wrapperCol={{ offset: 6 }} style={{ marginTop: '1rem' }}>

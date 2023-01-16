@@ -57,7 +57,7 @@ const columns: TableColumnsType<HabitRecord> = [
       }
       return (
         <Tag className='scale-75 sm:scale-100' color='cyan'>
-          {prettyMilliseconds(target * 1000)}
+          {prettyMilliseconds(target * 60 * 1000)}
         </Tag>
       );
     },

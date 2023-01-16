@@ -139,6 +139,8 @@ export default function UpdateHabitForm(props: UpdateHabitFormProps) {
             disabled={loading}
             clearButton={false}
             displayError={form.getFieldError('cron').length > 0}
+            allowedPeriods={['day', 'week', 'month', 'year']}
+            mode='single'
           />
         </Form.Item>
         <Form.Item wrapperCol={{ offset: 6 }} style={{ marginTop: '1rem' }}>

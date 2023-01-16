@@ -1,15 +1,34 @@
-import { Card, Typography } from 'antd';
+import { Card, Result, Typography } from 'antd';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import LayoutContainer from '../components/Layout';
 import { useEffect } from 'react';
-import { pocketbaseClient } from '../utils';
+import { pocketbaseClient, useNotification } from '../utils';
+import {
+  CheckCircleOutlined,
+  ExclamationCircleFilled,
+} from '@ant-design/icons';
 
 export default function Home() {
   const router = useRouter();
-  if (pocketbaseClient.authStore.isValid) {
-    router.push('/habits');
-  }
+  const [openNoti, contextHolder] = useNotification();
+  useEffect(() => {
+    if (pocketbaseClient.authStore.isValid) {
+      openNoti(
+        'Successfully sign you in',
+        'Redirecting...',
+        <CheckCircleOutlined />
+      );
+      router.push('/habits');
+    } else {
+      openNoti(
+        'Nothing to see here...',
+        'Redirecting you to sign-in',
+        <ExclamationCircleFilled />
+      );
+      router.push('/sign-in');
+    }
+  }, [openNoti, router]);
   function handleSignin(event: any) {
     router.push('/sign-in');
   }
@@ -22,6 +41,7 @@ export default function Home() {
         <title>Habit tracker</title>
         <meta name='viewport' content='initial-scale=1.0, width=device-width' />
       </Head>
+      {contextHolder}
       <LayoutContainer>
         <Card
           title={

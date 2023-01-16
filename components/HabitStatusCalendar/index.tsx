@@ -1,4 +1,13 @@
-import { Badge, Calendar, Spin, Typography } from 'antd';
+import {
+  Badge,
+  Calendar,
+  Card,
+  InputNumber,
+  Modal,
+  Spin,
+  Switch,
+  Form,
+} from 'antd';
 import {
   HabitRecord,
   HabitStatusRecord,
@@ -10,18 +19,64 @@ import {
 import { useEffect, useState } from 'react';
 import { useMedia } from 'react-use';
 import dayjs, { Dayjs } from 'dayjs';
-import {
-  CheckCircleTwoTone,
-  CloseCircleTwoTone,
-  StopTwoTone,
-} from '@ant-design/icons';
+import { CheckOutlined } from '@ant-design/icons';
+import prettyMilliseconds from 'pretty-ms';
+import DateCell from './DateCell';
 
 export type HabitStatusCalendarProps = {
   habit: HabitRecord;
+  keygen?: () => void;
 };
 
 export default function HabitStatusCalendar(props: HabitStatusCalendarProps) {
+  const [loading, setLoading] = useState<boolean>(false);
+  const [currentDate, setCurrentDate] = useState<Dayjs>(dayjs(new Date()));
+  const isLg = useMedia(`(min-width: ${breakPoints.lg}px)`, false);
+  const [occurences, setOccurences] = useState<{
+    count: number;
+    occurences: Date[];
+  }>(
+    getOccurences(getIntervals(props.habit.cron, 'month', currentDate.toDate()))
+  );
+  const [statuses, setStatuses] = useState<HabitStatusRecord[]>([]);
+  const [statusModalOpen, setStatusModalOpen] = useState<boolean>(false);
+  const [statusModalLoading, setStatusModalLoading] = useState<boolean>(false);
+  const [statusValue, setStatusValue] = useState<{
+    time: number | undefined;
+    done: boolean;
+  }>({
+    time: 0,
+    done: false,
+  });
+  const [key, setKey] = useState<number>(0);
+
+  const onSelect = (value: Dayjs) => {
+    setCurrentDate(value);
+    const status = statuses.find((v) => dayjs(v.date).isSame(value, 'day'));
+    console.log(status);
+    setStatusValue({
+      done: status?.done || false,
+      time: status ? status.time : undefined,
+    });
+    setStatusModalOpen(true);
+  };
+
+  const disabledDate = (value: Dayjs) => {
+    if (
+      occurences.occurences.filter((occur) => {
+        return dayjs(occur).isSame(value, 'day');
+      }).length > 0
+    ) {
+      return false;
+    } else {
+      return true;
+    }
+  };
+
   const dateCellRenderer = (value: Dayjs) => {
+    if (value.isAfter(dayjs(new Date()))) {
+      return <DateCell date={value} />;
+    }
     if (
       occurences.occurences.filter((occur) => {
         return dayjs(occur).isSame(value, 'day');
@@ -33,38 +88,72 @@ export default function HabitStatusCalendar(props: HabitStatusCalendarProps) {
       if (status) {
         if (status.done) {
           return (
-            <div className='w-full h-full flex justify-center items-center'>
-              <CheckCircleTwoTone
-                twoToneColor={'green'}
-                style={{
-                  color: 'white',
-                  scale: isLg ? '150%' : '50%',
-                }}
-              />
-            </div>
+            <DateCell
+              date={value}
+              onClick={() => onSelect(value)}
+              responsiveStyle={{
+                backgroundColor: '#ABC270',
+                color: 'white',
+              }}
+            >
+              <div className='w-full h-full flex justify-center items-center p-6'>
+                <CheckOutlined
+                  style={{
+                    color: 'green',
+                    scale: '125%',
+                  }}
+                />
+              </div>
+            </DateCell>
           );
         } else {
-          return (
-            <div className='flex justify-center items-center w-full h-full'>
-              <CloseCircleTwoTone
-                twoToneColor={'red'}
-                style={{
-                  scale: isLg ? '150%' : '50%',
+          if (!props.habit.target || props.habit.target <= 0) {
+            return (
+              <DateCell
+                date={value}
+                onClick={() => {
+                  onSelect(value);
                 }}
               />
-            </div>
-          );
+            );
+          } else
+            return (
+              <DateCell
+                date={value}
+                onClick={() => onSelect(value)}
+                responsiveStyle={{
+                  backgroundColor: '#567189',
+                  color: 'white',
+                }}
+              >
+                <div className='w-full flex justify-start'>
+                  <Badge
+                    status='processing'
+                    text={`${prettyMilliseconds(
+                      status.time * 60 * 1000
+                    )}/${prettyMilliseconds(props.habit.target * 60 * 1000)} `}
+                  />
+                </div>
+              </DateCell>
+            );
         }
       } else {
+        if (!props.habit.target || props.habit.target <= 0) {
+          return <DateCell date={value} onClick={() => onSelect(value)} />;
+        }
         return (
-          <div className='flex justify-center items-center w-full h-full'>
-            <CloseCircleTwoTone
-              twoToneColor={'red'}
-              style={{
-                scale: isLg ? '150%' : '50%',
-              }}
-            />
-          </div>
+          <DateCell
+            date={value}
+            onClick={() => onSelect(value)}
+            responsiveStyle={{
+              backgroundColor: '#EE6983',
+              color: 'white',
+            }}
+          >
+            <div className='w-full flex justify-start'>
+              <Badge status='error' text={`No data`} />
+            </div>
+          </DateCell>
         );
       }
     } else {
@@ -72,31 +161,40 @@ export default function HabitStatusCalendar(props: HabitStatusCalendarProps) {
         value.isAfter(occurences.occurences.at(-1)) ||
         value.isBefore(occurences.occurences.at(0))
       ) {
-        return;
+        return <DateCell date={value} />;
       }
-      return (
-        <div className='flex justify-center items-center w-full h-full'>
-          <StopTwoTone
-            twoToneColor={'gray'}
-            style={{
-              scale: isLg ? '150%' : '50%',
-            }}
-          />
-        </div>
-      );
+      return <DateCell date={value} />;
     }
   };
 
-  const [loading, setLoading] = useState<boolean>(false);
-  const [currentDate, setCurrentDate] = useState<Dayjs>(dayjs(new Date()));
-  const isLg = useMedia(`(min-width: ${breakPoints.lg}px)`, false);
-  const [occurences, setOccurences] = useState<{
-    count: number;
-    occurences: Date[];
-  }>(
-    getOccurences(getIntervals(props.habit.cron, 'month', currentDate.toDate()))
-  );
-  const [statuses, setStatuses] = useState<HabitStatusRecord[]>([]);
+  const onStatusModalOk = async () => {
+    const exist = statuses.find((v) =>
+      dayjs(v.date).isSame(currentDate, 'day')
+    );
+    setStatusModalLoading(true);
+    try {
+      if (exist) {
+        await pocketbaseClient.collection('habit_status').update(exist.id, {
+          time: statusValue.time ? statusValue.time : undefined,
+          done: statusValue.done,
+        });
+      } else {
+        await pocketbaseClient.collection('habit_status').create({
+          habit: props.habit.id,
+          time: statusValue.time ? statusValue.time : undefined,
+          done: statusValue.done,
+          date: currentDate.toISOString(),
+        });
+      }
+      setStatusModalLoading(false);
+      setStatusModalOpen(false);
+      setKey(Math.random());
+      if (props.keygen) props.keygen();
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   const onPanelChange = (date: Dayjs, mode: string) => {
     if (mode === 'year') {
       return;
@@ -112,15 +210,14 @@ export default function HabitStatusCalendar(props: HabitStatusCalendarProps) {
     pocketbaseClient
       .collection('habit_status')
       .getFullList<HabitStatusRecord>(occurences.count + 20, {
-        $cancelKey: `habit_status_${props.habit.id}_${currentDate}`,
+        $cancelKey: `habit_statuses_${props.habit.id}`,
         filter: `
           (habit="${props.habit.id}" && 
-          (created>="${occurences.occurences.at(0)?.toISOString()}" &&
-          created<="${occurences.occurences.at(-1)?.toISOString()}"))
+          (date>="${occurences.occurences.at(0)?.toISOString()}" &&
+          date<="${occurences.occurences.at(-1)?.toISOString()}"))
         `,
       })
       .then((data) => {
-        console.log(data);
         setStatuses(data);
       })
       .catch((e) => {
@@ -129,15 +226,73 @@ export default function HabitStatusCalendar(props: HabitStatusCalendarProps) {
       .finally(() => {
         setLoading(false);
       });
-  }, [occurences, props.habit.id, currentDate]);
+  }, [occurences, props.habit.id, key]);
+
   return (
     <Spin spinning={loading} delay={500}>
       <Calendar
         mode='month'
-        dateCellRender={dateCellRenderer}
+        dateFullCellRender={dateCellRenderer}
         fullscreen={isLg}
         onPanelChange={onPanelChange}
+        disabledDate={disabledDate}
+        value={currentDate}
+        key={key}
       />
+      <Modal
+        afterClose={() => {
+          setStatusValue({ done: false, time: undefined });
+        }}
+        open={statusModalOpen}
+        onCancel={() => {
+          setStatusModalOpen(false);
+        }}
+        confirmLoading={statusModalLoading}
+        onOk={onStatusModalOk}
+        okButtonProps={{
+          style: {
+            backgroundColor: '#3b82f6',
+          },
+        }}
+      >
+        <Card
+          title={`${currentDate.format('YYYY - MM/DD')}`}
+          bordered={false}
+          style={{
+            marginTop: '2rem',
+          }}
+        >
+          {props.habit.target && props.habit.target > 0 ? (
+            <Form.Item label={'Progress'}>
+              <InputNumber
+                addonAfter={`minutes out of ${prettyMilliseconds(
+                  props.habit.target * 60 * 1000
+                )}`}
+                onChange={(value: number | null) => {
+                  setStatusValue({
+                    done: !!value && value >= props.habit.target,
+                    time: value || 0,
+                  });
+                }}
+                value={statusValue.time}
+              />
+            </Form.Item>
+          ) : (
+            <Form.Item label={'Done?'}>
+              <Switch
+                style={{ marginLeft: '2rem' }}
+                onChange={(checked) => {
+                  setStatusValue({
+                    done: checked,
+                    time: undefined,
+                  });
+                }}
+                checked={statusValue.done}
+              />
+            </Form.Item>
+          )}
+        </Card>
+      </Modal>
     </Spin>
   );
 }

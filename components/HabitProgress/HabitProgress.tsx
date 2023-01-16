@@ -7,6 +7,7 @@ import {
   pocketbaseClient,
 } from '../../utils';
 import { Progress, Skeleton } from 'antd';
+import dayjs from 'dayjs';
 
 export type HabitProgressProps = {
   habit: HabitRecord;
@@ -33,13 +34,13 @@ export default function HabitProgress(props: HabitProgressProps) {
       .collection('habit_status')
       .getList<HabitStatusRecord>(1, 1, {
         $cancelKey: `${props.habit.id} ${props.period}`,
-        filter: `(habit="${
-          props.habit.id
-        }" && done=true && (created>="${occurences.occurences
-          .at(0)
-          ?.toISOString()}" && created<="${occurences.occurences
-          .at(-1)
-          ?.toISOString()}"))`,
+        filter: `(habit="${props.habit.id}" && done=true && (date>="${dayjs(
+          new Date()
+        )
+          .startOf(props.period)
+          .toISOString()}" && date<="${dayjs(new Date())
+          .endOf(props.period)
+          .toISOString()}"))`,
       })
       .then((data) => {
         setStatusesCount(data.totalItems);

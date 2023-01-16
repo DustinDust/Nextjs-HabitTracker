@@ -3,7 +3,7 @@ import { Admin, Record } from 'pocketbase';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { Layout, Card, Typography } from 'antd';
+import { Layout, Card, Typography, Spin } from 'antd';
 import Sider from '../../components/Sider';
 import { useMedia } from 'react-use';
 import { breakPoints, pocketbaseClient, useNotification } from '../../utils';
@@ -42,7 +42,6 @@ export default function ProfilePage() {
         .authRefresh()
         .then((data) => {
           setUser(data.record);
-          setLoading(false);
         })
         .catch((err) => {
           openNotification(
@@ -55,6 +54,9 @@ export default function ProfilePage() {
             },
             1
           );
+        })
+        .finally(() => {
+          setLoading(false);
         });
     }
   }, [openNotification, setUser, router, user?.id]);
@@ -80,7 +82,13 @@ export default function ProfilePage() {
                 </Typography.Title>
               }
             >
-              <UserProfile user={user} loading={loading} habitsNum={habitNum} />
+              <Spin spinning={loading}>
+                <UserProfile
+                  user={user}
+                  loading={loading}
+                  habitsNum={habitNum}
+                />
+              </Spin>
             </Card>
           </Layout.Content>
         </Layout>

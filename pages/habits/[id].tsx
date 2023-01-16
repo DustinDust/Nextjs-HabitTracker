@@ -8,6 +8,7 @@ import {
   Popconfirm,
   Skeleton,
   Space,
+  Spin,
   Typography,
 } from 'antd';
 import Sider from '../../components/Sider';
@@ -22,7 +23,6 @@ import { useEffect, useState } from 'react';
 import HabitInfo from '../../components/HabitInfo';
 import { HabitProgressCard } from '../../components/HabitProgress';
 import {
-  CheckCircleFilled,
   CheckCircleOutlined,
   DeleteOutlined,
   EditOutlined,
@@ -40,9 +40,9 @@ export default function HabitPage() {
   const [deleteDialougeShow, setDeleteDialougeShow] = useState<boolean>(false);
   const [deleteLoading, setDeleteLoading] = useState<boolean>(false);
   const [openNotification, contextHolder] = useNotification();
+  const [key, setKey] = useState<number>(0);
 
   useEffect(() => {
-    console.log(`rendering habit ${router.query.id}`);
     setLoading(true);
     if (!router.query.id) {
       return;
@@ -207,23 +207,28 @@ export default function HabitPage() {
                   )
                 }
               />
-              {habitData && !loading ? (
+              <Spin spinning={!habitData || loading}>
                 <HabitInfo habit={habitData} loading={loading} />
-              ) : (
-                <Skeleton style={{ marginTop: '1rem' }} active={true} />
-              )}
-              {habitData && !loading ? (
-                <HabitProgressCard habit={habitData} />
-              ) : (
-                <Skeleton active={true} />
-              )}
-              {!habitData ? (
-                <Skeleton />
-              ) : (
-                <Card title='Calendar'>
-                  <HabitStatusCalendar habit={habitData} />
-                </Card>
-              )}
+              </Spin>
+              <Spin spinning={loading}>
+                {habitData ? (
+                  <HabitProgressCard habit={habitData} key={key} />
+                ) : (
+                  <Skeleton />
+                )}
+              </Spin>
+              <Spin spinning={loading}>
+                {habitData ? (
+                  <Card title='Calendar'>
+                    <HabitStatusCalendar
+                      habit={habitData}
+                      keygen={() => setKey(Math.random() * 10000)}
+                    />
+                  </Card>
+                ) : (
+                  <Skeleton />
+                )}
+              </Spin>
             </Card>
           </Layout.Content>
         </Layout>
